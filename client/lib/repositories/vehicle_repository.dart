@@ -1,52 +1,49 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import '../models/vehicle.dart';
 
 class VehicleRepository {
-  static final VehicleRepository _instance = VehicleRepository._internal();
+  final String baseUrl;
 
-  VehicleRepository._internal();
+  VehicleRepository(this.baseUrl);
 
-  factory VehicleRepository() {
-    return _instance;
-  }
-
-  final List<Vehicle> _vehicles = [];
-
-  void add(Vehicle vehicle) {
-    _vehicles.add(vehicle);
-  }
-
-  List<Vehicle> getAll() {
-    return _vehicles;
-  }
-
-  Vehicle getById(String id) {
-    return _vehicles.firstWhere(
-      (v) => v.registrationNumber == id, // Use registrationNumber as the ID
-      orElse: () => throw Exception('Vehicle not found'),
-    );
-  }
-
-  List<Vehicle> getByOwner(String ownerPersonalNumber) {
-    return _vehicles
-        .where((v) => v.owner.personalNumber == ownerPersonalNumber)
-        .toList();
-  }
-
-  void update(Vehicle vehicle) {
-    var index = _vehicles
-        .indexWhere((v) => v.registrationNumber == vehicle.registrationNumber);
-    if (index != -1) {
-      _vehicles[index] = vehicle;
+  Future<List<Vehicle>> fetchAll() async {
+    final response = await http.get(Uri.parse('$baseUrl/vehicles'));
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((json) => Vehicle.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load vehicles');
     }
   }
 
-  void delete(String id) {
-    _vehicles.removeWhere(
-        (v) => v.registrationNumber == id); // Use id as registration number
+  Future<void> createVehicle(Vehicle vehicle) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/vehicles'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(vehicle.toJson()),
+    );
+    if (response.statusCode != 201) {
+      throw Exception('Failed to create vehicle');
+    }
   }
 
-  // Method to clear repository for testing
-  void clear() {
-    _vehicles.clear();
+  Future<void> updateVehicle(String regNumber, Vehicle vehicle) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/vehicles/$regNumber'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(vehicle.toJson()),
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update vehicle');
+    }
+  }
+
+  Future<void> deleteVehicle(String regNumber) async {
+    final response =
+        await http.delete(Uri.parse('$baseUrl/vehicles/$regNumber'));
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete vehicle');
+    }
   }
 }

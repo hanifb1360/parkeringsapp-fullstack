@@ -1,45 +1,60 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import '../models/parking_space.dart';
 
 class ParkingSpaceRepository {
-  static final ParkingSpaceRepository _instance =
-      ParkingSpaceRepository._internal();
+  final String baseUrl;
 
-  ParkingSpaceRepository._internal();
+  ParkingSpaceRepository(this.baseUrl);
 
-  factory ParkingSpaceRepository() {
-    return _instance;
-  }
-
-  final List<ParkingSpace> _parkingSpaces = [];
-
-  void add(ParkingSpace parkingSpace) {
-    _parkingSpaces.add(parkingSpace);
-  }
-
-  List<ParkingSpace> getAll() {
-    return _parkingSpaces;
-  }
-
-  ParkingSpace getById(String id) {
-    return _parkingSpaces.firstWhere(
-      (p) => p.id == id,
-      orElse: () => throw Exception('Parking space not found'),
-    );
-  }
-
-  void update(ParkingSpace parkingSpace) {
-    var index = _parkingSpaces.indexWhere((p) => p.id == parkingSpace.id);
-    if (index != -1) {
-      _parkingSpaces[index] = parkingSpace;
+  Future<List<ParkingSpace>> fetchAll() async {
+    final response = await http.get(Uri.parse('$baseUrl/parking-spaces'));
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((json) => ParkingSpace.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load parking spaces');
     }
   }
 
-  void delete(String id) {
-    _parkingSpaces.removeWhere((p) => p.id == id);
+  Future<ParkingSpace?> getById(String id) async {
+    final response = await http.get(Uri.parse('$baseUrl/parking-spaces/$id'));
+    if (response.statusCode == 200) {
+      return ParkingSpace.fromJson(json.decode(response.body));
+    } else if (response.statusCode == 404) {
+      return null; // Parking space not found
+    } else {
+      throw Exception('Failed to load parking space');
+    }
   }
 
-  // att rensa förvaret bara för testning
-  void clear() {
-    _parkingSpaces.clear();
+  Future<void> createParkingSpace(ParkingSpace parkingSpace) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/parking-spaces'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(parkingSpace.toJson()),
+    );
+    if (response.statusCode != 201) {
+      throw Exception('Failed to create parking space');
+    }
+  }
+
+  Future<void> updateParkingSpace(String id, ParkingSpace parkingSpace) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/parking-spaces/$id'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(parkingSpace.toJson()),
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update parking space');
+    }
+  }
+
+  Future<void> deleteParkingSpace(String id) async {
+    final response =
+        await http.delete(Uri.parse('$baseUrl/parking-spaces/$id'));
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete parking space');
+    }
   }
 }

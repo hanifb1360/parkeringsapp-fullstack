@@ -4,11 +4,11 @@ import '../repositories/vehicle_repository.dart';
 import '../repositories/parking_space_repository.dart';
 import '../models/parking.dart';
 
-// Funktion för att hantera parkeringar
-void manageParkings() {
-  final parkingRepo = ParkingRepository(); // Singleton-instans
-  final vehicleRepo = VehicleRepository(); // Singleton-instans
-  final parkingSpaceRepo = ParkingSpaceRepository(); // Singleton-instans
+Future<void> manageParkings() async {
+  final parkingRepo =
+      ParkingRepository('http://your-api-url-here'); // Pass base URL
+  final vehicleRepo = VehicleRepository('http://your-api-url-here');
+  final parkingSpaceRepo = ParkingSpaceRepository('http://your-api-url-here');
 
   print('\nDu har valt att hantera Parkeringar.');
   print('1. Skapa ny parkering');
@@ -24,23 +24,30 @@ void manageParkings() {
       // Skapa ny parkering
       stdout.write('Ange fordonets registreringsnummer: ');
       var regNumber = stdin.readLineSync();
-      var vehicle = vehicleRepo.getById(regNumber!); // Use getById instead
+      var vehicle =
+          await vehicleRepo.getById(regNumber!); // Fetch vehicle by ID
       stdout.write('Ange parkeringsplatsens ID: ');
       var parkingSpaceId = stdin.readLineSync();
-      var parkingSpace =
-          parkingSpaceRepo.getById(parkingSpaceId!); // Use getById
+      var parkingSpace = await parkingSpaceRepo
+          .getById(parkingSpaceId!); // Fetch parking space by ID
+
+      if (vehicle == null || parkingSpace == null) {
+        print('Ogiltigt fordon eller parkeringsplats.');
+        break;
+      }
+
       var parking = Parking(
           vehicle: vehicle,
           parkingSpace: parkingSpace,
           startTime: DateTime.now(),
           endTime: null);
-      parkingRepo.add(parking);
+      await parkingRepo.createParking(parking);
       print('Parkering skapad: $parking');
       break;
 
     case '2':
       // Visa alla parkeringar
-      var parkings = parkingRepo.getAll();
+      var parkings = await parkingRepo.fetchAll(); // Fetch all parkings
       if (parkings.isEmpty) {
         print('Inga parkeringar registrerade.');
       } else {
@@ -55,11 +62,17 @@ void manageParkings() {
       stdout.write(
           'Ange fordonets registreringsnummer för den parkering du vill uppdatera: ');
       var regNumber = stdin.readLineSync();
-      var parking = parkingRepo.getById(regNumber!); // Use getById
+      var parking =
+          await parkingRepo.getById(regNumber!); // Fetch parking by vehicle ID
+      if (parking == null) {
+        print('Ingen parkering hittades.');
+        break;
+      }
+
       stdout.write('Vill du avsluta parkeringen? (j/n): ');
       var shouldEnd = stdin.readLineSync();
       if (shouldEnd == 'j') {
-        endParking(parking);
+        await endParking(parking);
       } else {
         print('Parkeringen avslutas inte.');
       }
@@ -70,7 +83,8 @@ void manageParkings() {
       stdout.write(
           'Ange fordonets registreringsnummer för den parkering du vill ta bort: ');
       var regNumber = stdin.readLineSync();
-      parkingRepo.delete(regNumber!); // Use regNumber as id
+      await parkingRepo
+          .deleteParking(regNumber!); // Delete parking by vehicle ID
       print('Parkering borttagen.');
       break;
 
@@ -84,10 +98,9 @@ void manageParkings() {
 }
 
 // Funktion för att avsluta en parkering och beräkna kostnaden
-void endParking(Parking parking) {
-  final parkingRepo = ParkingRepository(); // Singleton-instans
-  parking.endTime = DateTime.now(); // Sätt sluttid till nu
-  parkingRepo.update(parking); // Uppdatera parkeringen i lagret
+Future<void> endParking(Parking parking) async {
+  await parkingRepo.updateParking(
+      parking.id, parking); // Update the parking in the repository
   print('Parkering avslutad.');
 
   // Beräkna kostnaden

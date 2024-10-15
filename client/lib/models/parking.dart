@@ -1,39 +1,54 @@
-import 'vehicle.dart';
-import 'parking_space.dart';
-
 class Parking {
-  Vehicle vehicle;
-  ParkingSpace parkingSpace;
+  String id;
+  String parkingSpaceId;
+  String vehicleRegNumber;
   DateTime startTime;
-  DateTime? endTime;
+  DateTime? endTime; // Make endTime nullable
 
   Parking({
-    required this.vehicle,
-    required this.parkingSpace,
+    required this.id,
+    required this.parkingSpaceId,
+    required this.vehicleRegNumber,
     required this.startTime,
-    this.endTime,
+    this.endTime, // Use this for the nullable field
   });
 
-  // Metod för att beräkna parkeringskostnaden
+  // Convert JSON to Parking object
+  factory Parking.fromJson(Map<String, dynamic> json) {
+    return Parking(
+      id: json['id'],
+      parkingSpaceId: json['parkingSpaceId'],
+      vehicleRegNumber: json['vehicleRegNumber'],
+      startTime: DateTime.parse(json['startTime']),
+      endTime: json['endTime'] != null
+          ? DateTime.parse(json['endTime'])
+          : null, // Handle null endTime
+    );
+  }
+
+  // Convert Parking object to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'parkingSpaceId': parkingSpaceId,
+      'vehicleRegNumber': vehicleRegNumber,
+      'startTime': startTime.toIso8601String(),
+      'endTime': endTime?.toIso8601String(), // Use optional chaining
+    };
+  }
+
   double calculateCost() {
     if (endTime == null) {
-      print('Parkeringen pågår fortfarande, ingen kostnad än.');
-      return 0;
+      return 0.0; // Cannot calculate cost if parking hasn't ended
     }
-
-    // Beräkna antalet timmar som fordonet har varit parkerat
+    // Example logic: Calculate duration in hours and multiply by a rate
     final duration = endTime!.difference(startTime).inHours;
-
-    // Om parkeringstiden är mindre än en timme, debitera för en hel timme
-    final hours = duration > 0 ? duration : 1;
-
-    /// Beräknar kostnaden baserat på parkeringsplatsens pris per timme
-    return hours * parkingSpace.pricePerHour;
+    const ratePerHour = 10.0; // Example rate
+    return duration * ratePerHour;
   }
 
   @override
   String toString() {
-    String status = endTime == null ? "pågående" : "avslutad";
-    return 'Parking(vehicle: ${vehicle.registrationNumber}, parkingSpace: ${parkingSpace.id}, status: $status)';
+    return 'Parking(id: $id, parkingSpaceId: $parkingSpaceId, vehicleRegNumber: $vehicleRegNumber, startTime: $startTime, endTime: $endTime)';
   }
 }

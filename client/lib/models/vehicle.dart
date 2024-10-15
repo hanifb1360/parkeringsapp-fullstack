@@ -1,14 +1,34 @@
-import 'person.dart';
-
 class Vehicle {
-  String registrationNumber;
-  String type; // "car", "motorcycle", etc.
-  Person owner;
+  String regNumber;
+  String ownerPersonalNumber;
+  String model;
 
-  Vehicle({required this.registrationNumber, required this.type, required this.owner});
+  Vehicle({
+    required this.regNumber,
+    required this.ownerPersonalNumber,
+    required this.model,
+  });
+
+  // Convert JSON to Vehicle object
+  factory Vehicle.fromJson(Map<String, dynamic> json) {
+    return Vehicle(
+      regNumber: json['regNumber'],
+      ownerPersonalNumber: json['ownerPersonalNumber'],
+      model: json['model'],
+    );
+  }
+
+  // Convert Vehicle object to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'regNumber': regNumber,
+      'ownerPersonalNumber': ownerPersonalNumber,
+      'model': model,
+    };
+  }
 
   @override
   String toString() {
-    return 'Vehicle(registrationNumber: $registrationNumber, type: $type, owner: ${owner.name})';
+    return 'Vehicle(regNumber: $regNumber, ownerPersonalNumber: $ownerPersonalNumber, model: $model)';
   }
 }

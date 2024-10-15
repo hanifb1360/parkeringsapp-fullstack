@@ -2,8 +2,8 @@ import 'dart:io';
 import '../repositories/parking_space_repository.dart';
 import '../models/parking_space.dart';
 
-void manageParkingSpaces() {
-  final repository = ParkingSpaceRepository();
+void manageParkingSpaces() async {
+  final repository = ParkingSpaceRepository('http://your-api-url-here');
 
   print('\nDu har valt att hantera Parkeringsplatser.');
   print('1. Skapa ny parkeringsplats');
@@ -37,13 +37,13 @@ void manageParkingSpaces() {
       }
       var parkingSpace =
           ParkingSpace(id: id, address: address, pricePerHour: pricePerHour);
-      repository.add(parkingSpace);
+      await repository.createParkingSpace(parkingSpace);
       print('Parkeringsplats skapad: $parkingSpace');
       break;
 
     case '2':
       // Visa alla parkeringsplatser
-      var parkingSpaces = repository.getAll();
+      var parkingSpaces = await repository.fetchAll();
       if (parkingSpaces.isEmpty) {
         print('Inga parkeringsplatser registrerade.');
       } else {
@@ -61,7 +61,11 @@ void manageParkingSpaces() {
         print('Ogiltigt ID, försök igen.');
         break;
       }
-      var parkingSpace = repository.getById(id);
+      var parkingSpace = await repository.getById(id);
+      if (parkingSpace == null) {
+        print('Ingen parkeringsplats hittades med det ID:t.');
+        break;
+      }
       stdout.write('Ange ny adress: ');
       var newAddress = stdin.readLineSync();
       if (newAddress == null || newAddress.isEmpty) {
@@ -76,7 +80,7 @@ void manageParkingSpaces() {
       }
       parkingSpace.address = newAddress;
       parkingSpace.pricePerHour = newPricePerHour;
-      repository.update(parkingSpace);
+      await repository.updateParkingSpace(id, parkingSpace);
       print('Parkeringsplats uppdaterad: $parkingSpace');
       break;
 
@@ -88,7 +92,7 @@ void manageParkingSpaces() {
         print('Ogiltigt ID, försök igen.');
         break;
       }
-      repository.delete(id);
+      await repository.deleteParkingSpace(id);
       print('Parkeringsplats borttagen.');
       break;
 
