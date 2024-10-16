@@ -1,14 +1,15 @@
-import 'person.dart';
+import 'package:objectbox/objectbox.dart';
 
+@Entity()
 class Vehicle {
-  String registrationNumber;
-  String type; // "car", "motorcycle", etc.
-  Person owner;
+  int id;
+  String regNumber;
+  String ownerPersonalNumber;
+  String model;
 
-  Vehicle({required this.registrationNumber, required this.type, required this.owner});
-
-  @override
-  String toString() {
-    return 'Vehicle(registrationNumber: $registrationNumber, type: $type, owner: ${owner.name})';
-  }
+  Vehicle(
+      {this.id = 0,
+      required this.regNumber,
+      required this.ownerPersonalNumber,
+      required this.model});
 }

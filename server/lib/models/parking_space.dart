@@ -1,13 +1,32 @@
+import 'package:objectbox/objectbox.dart';
+
+@Entity()
 class ParkingSpace {
-  String id;
-  String address;
-  double pricePerHour;
+  int id; // ObjectBox ID
+  String spaceNumber; // e.g., "A1"
+  bool isOccupied; // true if occupied, false otherwise
 
-  ParkingSpace({required this.id, required this.address, required this.pricePerHour});
+  ParkingSpace({
+    this.id = 0,
+    required this.spaceNumber,
+    required this.isOccupied,
+  });
 
-  @override
-  String toString() {
-    return 'ParkingSpace(id: $id, address: $address, pricePerHour: $pricePerHour)';
+  // Convert JSON to ParkingSpace object
+  factory ParkingSpace.fromJson(Map<String, dynamic> json) {
+    return ParkingSpace(
+      id: json['id'] ?? 0,
+      spaceNumber: json['spaceNumber'],
+      isOccupied: json['isOccupied'],
+    );
+  }
+
+  // Convert ParkingSpace object to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'spaceNumber': spaceNumber,
+      'isOccupied': isOccupied,
+    };
   }
 }
-

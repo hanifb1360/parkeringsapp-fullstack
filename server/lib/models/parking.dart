@@ -1,39 +1,40 @@
-import 'vehicle.dart';
-import 'parking_space.dart';
+import 'package:objectbox/objectbox.dart';
 
+@Entity()
 class Parking {
-  Vehicle vehicle;
-  ParkingSpace parkingSpace;
-  DateTime startTime;
-  DateTime? endTime;
+  int id; // ObjectBox ID
+  String vehicleRegNumber; // Registration number of the vehicle parked
+  String spaceNumber; // Number of the parking space
+  DateTime startTime; // Time when the vehicle was parked
+  DateTime? endTime; // Time when the vehicle was removed (optional)
 
   Parking({
-    required this.vehicle,
-    required this.parkingSpace,
+    this.id = 0,
+    required this.vehicleRegNumber,
+    required this.spaceNumber,
     required this.startTime,
     this.endTime,
   });
 
-  // Metod för att beräkna parkeringskostnaden
-  double calculateCost() {
-    if (endTime == null) {
-      print('Parkeringen pågår fortfarande, ingen kostnad än.');
-      return 0;
-    }
-
-    // Beräkna antalet timmar som fordonet har varit parkerat
-    final duration = endTime!.difference(startTime).inHours;
-
-    // Om parkeringstiden är mindre än en timme, debitera för en hel timme
-    final hours = duration > 0 ? duration : 1;
-
-    /// Beräknar kostnaden baserat på parkeringsplatsens pris per timme
-    return hours * parkingSpace.pricePerHour;
+  // Convert JSON to Parking object
+  factory Parking.fromJson(Map<String, dynamic> json) {
+    return Parking(
+      id: json['id'] ?? 0,
+      vehicleRegNumber: json['vehicleRegNumber'],
+      spaceNumber: json['spaceNumber'],
+      startTime: DateTime.parse(json['startTime']),
+      endTime: json['endTime'] != null ? DateTime.parse(json['endTime']) : null,
+    );
   }
 
-  @override
-  String toString() {
-    String status = endTime == null ? "pågående" : "avslutad";
-    return 'Parking(vehicle: ${vehicle.registrationNumber}, parkingSpace: ${parkingSpace.id}, status: $status)';
+  // Convert Parking object to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'vehicleRegNumber': vehicleRegNumber,
+      'spaceNumber': spaceNumber,
+      'startTime': startTime.toIso8601String(),
+      'endTime': endTime?.toIso8601String(),
+    };
   }
 }
