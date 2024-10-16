@@ -4,9 +4,11 @@ import '../repositories/person_repository.dart';
 import 'vehicle_search.dart';
 import '../models/vehicle.dart';
 
-void manageVehicles() {
-  final vehicleRepo = VehicleRepository(); // Singleton-instans
-  final personRepo = PersonRepository(); // Singleton-instans
+void manageVehicles() async {
+  final vehicleRepo =
+      VehicleRepository('http://localhost:3000'); // Pass the baseUrl
+  final personRepo =
+      PersonRepository('http://localhost:3000'); // Pass the baseUrl
 
   print('\nDu har valt att hantera Fordon.');
   print('1. Skapa nytt fordon');
@@ -22,19 +24,29 @@ void manageVehicles() {
     case '1':
       stdout.write('Ange registreringsnummer: ');
       var registrationNumber = stdin.readLineSync();
-      stdout.write('Ange typ (bil, motorcykel, etc.): ');
-      var type = stdin.readLineSync();
+      stdout.write('Ange modell (bil, motorcykel, etc.): ');
+      var model = stdin.readLineSync();
       stdout.write('Ange ägarens personnummer: ');
       var ownerPersonalNumber = stdin.readLineSync();
-      var owner = personRepo.getById(ownerPersonalNumber!); // Fetch owner by ID
+
+      var owner =
+          await personRepo.getById(ownerPersonalNumber!); // Fetch owner by ID
+      if (owner == null) {
+        print('Ägaren hittades inte.');
+        return;
+      }
+
       var vehicle = Vehicle(
-          registrationNumber: registrationNumber!, type: type!, owner: owner);
-      vehicleRepo.add(vehicle);
+        regNumber: registrationNumber!,
+        ownerPersonalNumber: ownerPersonalNumber,
+        model: model!,
+      );
+      await vehicleRepo.createVehicle(vehicle);
       print('Fordon skapad: $vehicle');
       break;
 
     case '2':
-      var vehicles = vehicleRepo.getAll();
+      var vehicles = await vehicleRepo.fetchAll();
       if (vehicles.isEmpty) {
         print('Inga fordon registrerade.');
       } else {
@@ -49,25 +61,31 @@ void manageVehicles() {
           .write('Ange registreringsnummer för det fordon du vill uppdatera: ');
       var registrationNumber = stdin.readLineSync();
       var vehicle =
-          vehicleRepo.getById(registrationNumber!); // Use getById here
-      stdout.write('Ange ny typ (bil, motorcykel, etc.): ');
-      var newType = stdin.readLineSync();
-      vehicle.type = newType!;
-      vehicleRepo.update(vehicle);
+          await vehicleRepo.getById(registrationNumber!); // Fetch by reg number
+
+      if (vehicle == null) {
+        print('Fordon hittades inte.');
+        return;
+      }
+
+      stdout.write('Ange ny modell (bil, motorcykel, etc.): ');
+      var newModel = stdin.readLineSync();
+      vehicle.model = newModel!;
+
+      await vehicleRepo.updateVehicle(vehicle.regNumber, vehicle);
       print('Fordon uppdaterad: $vehicle');
       break;
 
     case '4':
       stdout.write('Ange registreringsnummer för det fordon du vill ta bort: ');
       var registrationNumber = stdin.readLineSync();
-      vehicleRepo
-          .delete(registrationNumber!); // Använd registreringsnummer som ID
+      await vehicleRepo
+          .deleteVehicle(registrationNumber!); // Use registrationNumber
       print('Fordon borttagen.');
       break;
 
     case '5':
-      // Anropa sökfunktionen för att hitta fordon efter ägare
-      searchVehiclesByOwner(vehicleRepo);
+      await searchVehiclesByOwner(vehicleRepo);
       break;
 
     case '6':

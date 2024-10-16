@@ -3,7 +3,7 @@ import '../repositories/parking_space_repository.dart';
 import '../models/parking_space.dart';
 
 void manageParkingSpaces() async {
-  final repository = ParkingSpaceRepository('http://your-api-url-here');
+  final repository = ParkingSpaceRepository('http://localhost:8080');
 
   print('\nDu har valt att hantera Parkeringsplatser.');
   print('1. Skapa ny parkeringsplats');

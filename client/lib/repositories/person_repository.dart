@@ -18,6 +18,19 @@ class PersonRepository {
     }
   }
 
+  // Fetch a person by personal number
+  Future<Person?> getById(String personalNumber) async {
+    final response =
+        await http.get(Uri.parse('$baseUrl/persons/$personalNumber'));
+    if (response.statusCode == 200) {
+      return Person.fromJson(json.decode(response.body));
+    } else if (response.statusCode == 404) {
+      return null; // Person not found
+    } else {
+      throw Exception('Failed to load person');
+    }
+  }
+
   // Create a new person
   Future<void> createPerson(Person person) async {
     final response = await http.post(

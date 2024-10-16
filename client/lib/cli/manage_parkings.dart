@@ -5,10 +5,9 @@ import '../repositories/parking_space_repository.dart';
 import '../models/parking.dart';
 
 Future<void> manageParkings() async {
-  final parkingRepo =
-      ParkingRepository('http://your-api-url-here'); // Pass base URL
-  final vehicleRepo = VehicleRepository('http://your-api-url-here');
-  final parkingSpaceRepo = ParkingSpaceRepository('http://your-api-url-here');
+  final parkingRepo = ParkingRepository('http://localhost:8080');
+  final vehicleRepo = VehicleRepository('http://localhost:8080');
+  final parkingSpaceRepo = ParkingSpaceRepository('http://localhost:8080');
 
   print('\nDu har valt att hantera Parkeringar.');
   print('1. Skapa ny parkering');
@@ -36,11 +35,18 @@ Future<void> manageParkings() async {
         break;
       }
 
+      String parkingId = DateTime.now()
+          .millisecondsSinceEpoch
+          .toString(); // Generate parking ID
+
       var parking = Parking(
-          vehicle: vehicle,
-          parkingSpace: parkingSpace,
-          startTime: DateTime.now(),
-          endTime: null);
+        id: parkingId, // Set the ID
+        parkingSpaceId: parkingSpaceId,
+        vehicleRegNumber: regNumber,
+        startTime: DateTime.now(),
+        endTime: null, // Initially, endTime is null
+      );
+
       await parkingRepo.createParking(parking);
       print('Parkering skapad: $parking');
       break;
@@ -72,7 +78,7 @@ Future<void> manageParkings() async {
       stdout.write('Vill du avsluta parkeringen? (j/n): ');
       var shouldEnd = stdin.readLineSync();
       if (shouldEnd == 'j') {
-        await endParking(parking);
+        await endParking(parkingRepo, parking); // Pass parkingRepo and parking
       } else {
         print('Parkeringen avslutas inte.');
       }
@@ -98,7 +104,8 @@ Future<void> manageParkings() async {
 }
 
 // Funktion för att avsluta en parkering och beräkna kostnaden
-Future<void> endParking(Parking parking) async {
+Future<void> endParking(ParkingRepository parkingRepo, Parking parking) async {
+  parking.endTime = DateTime.now(); // Set the end time to now
   await parkingRepo.updateParking(
       parking.id, parking); // Update the parking in the repository
   print('Parkering avslutad.');
