@@ -6,9 +6,9 @@ import '../models/vehicle.dart';
 
 void manageVehicles() async {
   final vehicleRepo =
-      VehicleRepository('http://localhost:3000'); // Pass the baseUrl
+      VehicleRepository('http://localhost:8080'); // Pass the baseUrl
   final personRepo =
-      PersonRepository('http://localhost:3000'); // Pass the baseUrl
+      PersonRepository('http://localhost:8080'); // Pass the baseUrl
 
   print('\nDu har valt att hantera Fordon.');
   print('1. Skapa nytt fordon');
