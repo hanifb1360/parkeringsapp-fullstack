@@ -3,41 +3,41 @@ import '../models/person.dart';
 import 'dart:async';
 
 class PersonRepository {
-  final Box<Person> _box; // Box to store Person objects
+  final Box<Person> _box;
 
-  // Constructor
   PersonRepository(this._box);
 
   Future<List<Person>> getAll() async {
-    return _box.getAll(); // Get all Person objects from ObjectBox
+    return _box.getAll();
   }
 
   Future<Person?> getById(int id) async {
-    return _box.get(id); // Get a Person object by ID from ObjectBox
+    return _box.get(id);
   }
 
-  Future<void> create(Person person) async {
-    person.id =
-        _box.put(person); // Directly assign the returned ID to person.id
+  Future<Person> create(Person person) async {
+    person.id = _box.put(person);
+    return person;
   }
 
-  Future<bool> update(int id, Person updatedPerson) async {
+  Future<Person> update(int id, Person updatedPerson) async {
     final existingPerson = await getById(id);
     if (existingPerson != null) {
-      updatedPerson.id =
-          id; // Ensure the ID is set for the updated Person object
-      _box.put(updatedPerson); // Update the Person object in ObjectBox
-      return true;
+      updatedPerson.id = id;
+      _box.put(updatedPerson);
+      return updatedPerson;
+    } else {
+      throw Exception("Person not found");
     }
-    return false;
   }
 
-  Future<bool> delete(int id) async {
+  Future<Person> delete(int id) async {
     final existingPerson = await getById(id);
     if (existingPerson != null) {
-      _box.remove(id); // Remove the Person object from ObjectBox
-      return true;
+      _box.remove(id);
+      return existingPerson;
+    } else {
+      throw Exception("Person not found");
     }
-    return false;
   }
 }
