@@ -82,22 +82,22 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(3, 6241385207373150112),
       name: 'Person',
-      lastPropertyId: const obx_int.IdUid(3, 2849817343485822149),
+      lastPropertyId: const obx_int.IdUid(4, 4892794998140215148),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
             id: const obx_int.IdUid(1, 2438896930970458084),
             name: 'id',
             type: 6,
-            flags: 1),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(2, 3904661355112402022),
-            name: 'personalNumber',
-            type: 9,
-            flags: 0),
+            flags: 129),
         obx_int.ModelProperty(
             id: const obx_int.IdUid(3, 2849817343485822149),
             name: 'name',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 4892794998140215148),
+            name: 'email',
             type: 9,
             flags: 0)
       ],
@@ -106,27 +106,27 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(4, 8338507857970779540),
       name: 'Vehicle',
-      lastPropertyId: const obx_int.IdUid(4, 8152864050035943998),
+      lastPropertyId: const obx_int.IdUid(6, 2301332534427506108),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
             id: const obx_int.IdUid(1, 8039053713976805612),
             name: 'id',
             type: 6,
-            flags: 1),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(2, 4928942183748379912),
-            name: 'regNumber',
-            type: 9,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(3, 6044305739017911674),
-            name: 'ownerPersonalNumber',
-            type: 9,
-            flags: 0),
+            flags: 129),
         obx_int.ModelProperty(
             id: const obx_int.IdUid(4, 8152864050035943998),
             name: 'model',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 4508219417058989707),
+            name: 'licensePlate',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(6, 2301332534427506108),
+            name: 'color',
             type: 9,
             flags: 0)
       ],
@@ -174,7 +174,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
       lastSequenceId: const obx_int.IdUid(0, 0),
       retiredEntityUids: const [],
       retiredIndexUids: const [],
-      retiredPropertyUids: const [],
+      retiredPropertyUids: const [
+        3904661355112402022,
+        4928942183748379912,
+        6044305739017911674
+      ],
       retiredRelationUids: const [],
       modelVersion: 5,
       modelVersionParserMinimum: 5,
@@ -272,12 +276,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
           object.id = id;
         },
         objectToFB: (Person object, fb.Builder fbb) {
-          final personalNumberOffset = fbb.writeString(object.personalNumber);
           final nameOffset = fbb.writeString(object.name);
-          fbb.startTable(4);
+          final emailOffset = fbb.writeString(object.email);
+          fbb.startTable(5);
           fbb.addInt64(0, object.id);
-          fbb.addOffset(1, personalNumberOffset);
           fbb.addOffset(2, nameOffset);
+          fbb.addOffset(3, emailOffset);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -286,15 +290,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final rootOffset = buffer.derefObject(0);
           final idParam =
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
-          final personalNumberParam =
-              const fb.StringReader(asciiOptimization: true)
-                  .vTableGet(buffer, rootOffset, 6, '');
           final nameParam = const fb.StringReader(asciiOptimization: true)
               .vTableGet(buffer, rootOffset, 8, '');
-          final object = Person(
-              id: idParam,
-              personalNumber: personalNumberParam,
-              name: nameParam);
+          final emailParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 10, '');
+          final object =
+              Person(id: idParam, name: nameParam, email: emailParam);
 
           return object;
         }),
@@ -307,15 +308,14 @@ obx_int.ModelDefinition getObjectBoxModel() {
           object.id = id;
         },
         objectToFB: (Vehicle object, fb.Builder fbb) {
-          final regNumberOffset = fbb.writeString(object.regNumber);
-          final ownerPersonalNumberOffset =
-              fbb.writeString(object.ownerPersonalNumber);
           final modelOffset = fbb.writeString(object.model);
-          fbb.startTable(5);
+          final licensePlateOffset = fbb.writeString(object.licensePlate);
+          final colorOffset = fbb.writeString(object.color);
+          fbb.startTable(7);
           fbb.addInt64(0, object.id);
-          fbb.addOffset(1, regNumberOffset);
-          fbb.addOffset(2, ownerPersonalNumberOffset);
           fbb.addOffset(3, modelOffset);
+          fbb.addOffset(4, licensePlateOffset);
+          fbb.addOffset(5, colorOffset);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -324,18 +324,18 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final rootOffset = buffer.derefObject(0);
           final idParam =
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
-          final regNumberParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGet(buffer, rootOffset, 6, '');
-          final ownerPersonalNumberParam =
+          final licensePlateParam =
               const fb.StringReader(asciiOptimization: true)
-                  .vTableGet(buffer, rootOffset, 8, '');
+                  .vTableGet(buffer, rootOffset, 12, '');
           final modelParam = const fb.StringReader(asciiOptimization: true)
               .vTableGet(buffer, rootOffset, 10, '');
+          final colorParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 14, '');
           final object = Vehicle(
               id: idParam,
-              regNumber: regNumberParam,
-              ownerPersonalNumber: ownerPersonalNumberParam,
-              model: modelParam);
+              licensePlate: licensePlateParam,
+              model: modelParam,
+              color: colorParam);
 
           return object;
         })
@@ -388,12 +388,12 @@ class Person_ {
   static final id =
       obx.QueryIntegerProperty<Person>(_entities[2].properties[0]);
 
-  /// See [Person.personalNumber].
-  static final personalNumber =
-      obx.QueryStringProperty<Person>(_entities[2].properties[1]);
-
   /// See [Person.name].
   static final name =
+      obx.QueryStringProperty<Person>(_entities[2].properties[1]);
+
+  /// See [Person.email].
+  static final email =
       obx.QueryStringProperty<Person>(_entities[2].properties[2]);
 }
 
@@ -403,15 +403,15 @@ class Vehicle_ {
   static final id =
       obx.QueryIntegerProperty<Vehicle>(_entities[3].properties[0]);
 
-  /// See [Vehicle.regNumber].
-  static final regNumber =
-      obx.QueryStringProperty<Vehicle>(_entities[3].properties[1]);
-
-  /// See [Vehicle.ownerPersonalNumber].
-  static final ownerPersonalNumber =
-      obx.QueryStringProperty<Vehicle>(_entities[3].properties[2]);
-
   /// See [Vehicle.model].
   static final model =
+      obx.QueryStringProperty<Vehicle>(_entities[3].properties[1]);
+
+  /// See [Vehicle.licensePlate].
+  static final licensePlate =
+      obx.QueryStringProperty<Vehicle>(_entities[3].properties[2]);
+
+  /// See [Vehicle.color].
+  static final color =
       obx.QueryStringProperty<Vehicle>(_entities[3].properties[3]);
 }
