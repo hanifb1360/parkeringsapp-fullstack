@@ -8,36 +8,56 @@ class ParkingSpaceRepository {
   ParkingSpaceRepository(this._box);
 
   Future<List<ParkingSpace>> getAll() async {
-    return _box.getAll();
+    try {
+      return _box.getAll();
+    } catch (e) {
+      throw Exception("Failed to fetch parking spaces: $e");
+    }
   }
 
   Future<ParkingSpace?> getById(int id) async {
-    return _box.get(id);
+    try {
+      return _box.get(id);
+    } catch (e) {
+      throw Exception("Failed to fetch parking space by ID: $e");
+    }
   }
 
   Future<ParkingSpace> create(ParkingSpace space) async {
-    space.id = _box.put(space);
-    return space;
+    try {
+      space.id = _box.put(space);
+      return space;
+    } catch (e) {
+      throw Exception("Failed to create parking space: $e");
+    }
   }
 
   Future<ParkingSpace> update(int id, ParkingSpace updatedSpace) async {
-    final existingSpace = await getById(id);
-    if (existingSpace != null) {
-      updatedSpace.id = id;
-      _box.put(updatedSpace);
-      return updatedSpace;
-    } else {
-      throw Exception("Parking space not found");
+    try {
+      final existingSpace = await getById(id);
+      if (existingSpace != null) {
+        updatedSpace.id = id;
+        _box.put(updatedSpace);
+        return updatedSpace;
+      } else {
+        throw Exception("Parking space not found");
+      }
+    } catch (e) {
+      throw Exception("Failed to update parking space: $e");
     }
   }
 
   Future<ParkingSpace> delete(int id) async {
-    final existingSpace = await getById(id);
-    if (existingSpace != null) {
-      _box.remove(id);
-      return existingSpace;
-    } else {
-      throw Exception("Parking space not found");
+    try {
+      final existingSpace = await getById(id);
+      if (existingSpace != null) {
+        _box.remove(id);
+        return existingSpace;
+      } else {
+        throw Exception("Parking space not found");
+      }
+    } catch (e) {
+      throw Exception("Failed to delete parking space: $e");
     }
   }
 }

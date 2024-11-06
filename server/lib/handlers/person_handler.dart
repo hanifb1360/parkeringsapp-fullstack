@@ -9,35 +9,67 @@ class PersonHandler {
   PersonHandler(this.repository);
 
   Future<Response> getAll(Request request) async {
-    final persons = await repository.getAll();
-    return Response.ok(jsonEncode(persons.map((p) => p.toJson()).toList()));
+    try {
+      final persons = await repository.getAll();
+      return Response.ok(jsonEncode(persons.map((p) => p.toJson()).toList()));
+    } catch (e) {
+      return Response.internalServerError(body: 'Failed to fetch persons: $e');
+    }
   }
 
   Future<Response> getById(Request request, String id) async {
-    final person = await repository.getById(int.parse(id));
-    return person != null
-        ? Response.ok(jsonEncode(person.toJson()))
-        : Response.notFound('Person not found');
+    try {
+      final personId = int.tryParse(id);
+      if (personId == null) {
+        return Response.badRequest(body: 'Invalid person ID');
+      }
+      final person = await repository.getById(personId);
+      return person != null
+          ? Response.ok(jsonEncode(person.toJson()))
+          : Response.notFound('Person not found');
+    } catch (e) {
+      return Response.internalServerError(body: 'Failed to fetch person: $e');
+    }
   }
 
   Future<Response> create(Request request) async {
-    final payload = await request.readAsString();
-    final data = jsonDecode(payload) as Map<String, dynamic>;
-    final person = Person.fromJson(data);
-    await repository.create(person);
-    return Response(201, body: 'Person created');
+    try {
+      final payload = await request.readAsString();
+      final data = jsonDecode(payload) as Map<String, dynamic>;
+      final person = Person.fromJson(data);
+      await repository.create(person);
+      return Response(201, body: 'Person created');
+    } catch (e) {
+      return Response.internalServerError(body: 'Failed to create person: $e');
+    }
   }
 
   Future<Response> update(Request request, String id) async {
-    final payload = await request.readAsString();
-    final data = jsonDecode(payload) as Map<String, dynamic>;
-    final person = Person.fromJson(data);
-    await repository.update(int.parse(id), person);
-    return Response.ok('Person updated');
+    try {
+      final personId = int.tryParse(id);
+      if (personId == null) {
+        return Response.badRequest(body: 'Invalid person ID');
+      }
+      final payload = await request.readAsString();
+      final data = jsonDecode(payload) as Map<String, dynamic>;
+      final person = Person.fromJson(data);
+      await repository.update(personId, person);
+      return Response.ok('Person updated');
+    } catch (e) {
+      return Response.internalServerError(body: 'Failed to update person: $e');
+    }
   }
 
   Future<Response> delete(Request request, String id) async {
-    await repository.delete(int.parse(id));
-    return Response.ok('Person deleted');
+    try {
+      final personId = int.tryParse(id);
+      if (personId == null) {
+        return Response.badRequest(body: 'Invalid person ID');
+      }
+      await repository.delete(personId);
+      return Response.ok('Person deleted');
+    } catch (e) {
+      return Response.internalServerError(body: 'Failed to delete person: $e');
+    }
   }
 }

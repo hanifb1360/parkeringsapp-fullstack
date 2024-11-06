@@ -8,36 +8,56 @@ class ParkingRepository {
   ParkingRepository(this._box);
 
   Future<List<Parking>> getAll() async {
-    return _box.getAll();
+    try {
+      return _box.getAll();
+    } catch (e) {
+      throw Exception("Failed to fetch parking records: $e");
+    }
   }
 
   Future<Parking?> getById(int id) async {
-    return _box.get(id);
+    try {
+      return _box.get(id);
+    } catch (e) {
+      throw Exception("Failed to fetch parking record by ID: $e");
+    }
   }
 
   Future<Parking> create(Parking parking) async {
-    parking.id = _box.put(parking);
-    return parking;
+    try {
+      parking.id = _box.put(parking);
+      return parking;
+    } catch (e) {
+      throw Exception("Failed to create parking record: $e");
+    }
   }
 
   Future<Parking> update(int id, Parking updatedParking) async {
-    final existingParking = await getById(id);
-    if (existingParking != null) {
-      updatedParking.id = id;
-      _box.put(updatedParking);
-      return updatedParking;
-    } else {
-      throw Exception("Parking not found");
+    try {
+      final existingParking = await getById(id);
+      if (existingParking != null) {
+        updatedParking.id = id;
+        _box.put(updatedParking);
+        return updatedParking;
+      } else {
+        throw Exception("Parking not found");
+      }
+    } catch (e) {
+      throw Exception("Failed to update parking record: $e");
     }
   }
 
   Future<Parking> delete(int id) async {
-    final existingParking = await getById(id);
-    if (existingParking != null) {
-      _box.remove(id);
-      return existingParking;
-    } else {
-      throw Exception("Parking not found");
+    try {
+      final existingParking = await getById(id);
+      if (existingParking != null) {
+        _box.remove(id);
+        return existingParking;
+      } else {
+        throw Exception("Parking not found");
+      }
+    } catch (e) {
+      throw Exception("Failed to delete parking record: $e");
     }
   }
 }
