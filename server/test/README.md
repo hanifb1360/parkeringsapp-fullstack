@@ -1,0 +1,1 @@
+dart test test/all_tests.dart
