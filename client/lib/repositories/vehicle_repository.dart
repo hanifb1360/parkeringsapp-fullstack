@@ -1,12 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/vehicle.dart';
+import '../http_service.dart';
 
 class VehicleRepository {
-  final String baseUrl;
-
-  VehicleRepository(this.baseUrl);
-
   // Fetch all vehicles
   Future<List<Vehicle>> fetchAll() async {
     final response = await http.get(Uri.parse('$baseUrl/vehicles'));
@@ -54,7 +51,6 @@ class VehicleRepository {
   // Fetch a vehicle by registration number (ID)
   Future<Vehicle?> getById(String regNumber) async {
     final response = await http.get(Uri.parse('$baseUrl/vehicles/$regNumber'));
-
     if (response.statusCode == 200) {
       return Vehicle.fromJson(json.decode(response.body));
     } else if (response.statusCode == 404) {

@@ -3,8 +3,7 @@ import '../repositories/person_repository.dart';
 import '../models/person.dart';
 
 void managePersons() async {
-  final repository = PersonRepository('http://localhost:8080'); // Pass base URL
-
+  final repository = PersonRepository();
   while (true) {
     print('\nDu har valt att hantera Personer.');
     print('1. Skapa ny person');

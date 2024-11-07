@@ -5,9 +5,9 @@ import '../repositories/parking_space_repository.dart';
 import '../models/parking.dart';
 
 Future<void> manageParkings() async {
-  final parkingRepo = ParkingRepository('http://localhost:8080');
-  final vehicleRepo = VehicleRepository('http://localhost:8080');
-  final parkingSpaceRepo = ParkingSpaceRepository('http://localhost:8080');
+  final parkingRepo = ParkingRepository();
+  final vehicleRepo = VehicleRepository();
+  final parkingSpaceRepo = ParkingSpaceRepository();
 
   print('\nDu har valt att hantera Parkeringar.');
   print('1. Skapa ny parkering');

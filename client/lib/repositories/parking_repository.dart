@@ -1,12 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/parking.dart';
+import '../http_service.dart';
 
 class ParkingRepository {
-  final String baseUrl;
-
-  ParkingRepository(this.baseUrl);
-
   // Fetch all parkings
   Future<List<Parking>> fetchAll() async {
     final response = await http.get(Uri.parse('$baseUrl/parkings'));
@@ -18,9 +15,9 @@ class ParkingRepository {
     }
   }
 
-  // Fetch a parking by vehicle registration number or ID
-  Future<Parking?> getById(String regNumber) async {
-    final response = await http.get(Uri.parse('$baseUrl/parkings/$regNumber'));
+  // Fetch a parking by ID
+  Future<Parking?> getById(String id) async {
+    final response = await http.get(Uri.parse('$baseUrl/parkings/$id'));
     if (response.statusCode == 200) {
       return Parking.fromJson(json.decode(response.body));
     } else if (response.statusCode == 404) {

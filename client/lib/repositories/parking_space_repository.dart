@@ -1,12 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/parking_space.dart';
+import '../http_service.dart'; // Import the baseUrl here
 
 class ParkingSpaceRepository {
-  final String baseUrl;
-
-  ParkingSpaceRepository(this.baseUrl);
-
+  // Fetch all parking spaces
   Future<List<ParkingSpace>> fetchAll() async {
     final response = await http.get(Uri.parse('$baseUrl/parking-spaces'));
     if (response.statusCode == 200) {
@@ -17,6 +15,7 @@ class ParkingSpaceRepository {
     }
   }
 
+  // Fetch a parking space by ID
   Future<ParkingSpace?> getById(String id) async {
     final response = await http.get(Uri.parse('$baseUrl/parking-spaces/$id'));
     if (response.statusCode == 200) {
@@ -28,6 +27,7 @@ class ParkingSpaceRepository {
     }
   }
 
+  // Create a new parking space
   Future<void> createParkingSpace(ParkingSpace parkingSpace) async {
     final response = await http.post(
       Uri.parse('$baseUrl/parking-spaces'),
@@ -39,6 +39,7 @@ class ParkingSpaceRepository {
     }
   }
 
+  // Update an existing parking space
   Future<void> updateParkingSpace(String id, ParkingSpace parkingSpace) async {
     final response = await http.put(
       Uri.parse('$baseUrl/parking-spaces/$id'),
@@ -50,6 +51,7 @@ class ParkingSpaceRepository {
     }
   }
 
+  // Delete a parking space
   Future<void> deleteParkingSpace(String id) async {
     final response =
         await http.delete(Uri.parse('$baseUrl/parking-spaces/$id'));

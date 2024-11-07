@@ -38,9 +38,11 @@ class PersonHandler {
       final data = jsonDecode(payload) as Map<String, dynamic>;
       final person = Person.fromJson(data);
       await repository.create(person);
+      print('Person saved to database: ${person.toJson()}');
       return Response(201, body: 'Person created');
     } catch (e) {
-      return Response.internalServerError(body: 'Failed to create person: $e');
+      print('Error saving person: $e');
+      return Response.internalServerError(body: 'Error saving person');
     }
   }
 
