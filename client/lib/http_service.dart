@@ -1,4 +1,4 @@
+import 'api_client.dart';
+
 const String baseUrl = 'http://localhost:8080';
-void logBaseUrl() {
-  print('Using baseUrl: $baseUrl');
-}
+final ApiClient apiClient = ApiClient(baseUrl: baseUrl);

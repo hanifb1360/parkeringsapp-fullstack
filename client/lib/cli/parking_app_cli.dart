@@ -1,12 +1,11 @@
 import 'dart:io';
 
-// Importera de separata CLI-hanteringsfilerna
 import 'manage_persons.dart';
 import 'manage_vehicles.dart';
 import 'manage_parking_spaces.dart';
 import 'manage_parkings.dart';
 
-void runCLI() {
+Future<void> runCLI() async {
   while (true) {
     print('\nVälkommen till Parkeringsappen!');
     print('Vad vill du hantera?');
@@ -20,16 +19,20 @@ void runCLI() {
 
     switch (choice) {
       case '1':
-        managePersons();
+        print('Navigating to managePersons...');
+        await managePersons();
         break;
       case '2':
-        manageVehicles();
+        print('Navigating to manageVehicles...');
+        await manageVehicles();
         break;
       case '3':
-        manageParkingSpaces();
+        print('Navigating to manageParkingSpaces...');
+        await manageParkingSpaces();
         break;
       case '4':
-        manageParkings();
+        print('Navigating to manageParkings...');
+        await manageParkings();
         break;
       case '5':
         print('Avslutar...');

@@ -4,7 +4,7 @@ import '../repositories/person_repository.dart';
 import 'vehicle_search.dart';
 import '../models/vehicle.dart';
 
-void manageVehicles() async {
+Future<void> manageVehicles() async {
   final vehicleRepo = VehicleRepository();
   final personRepo = PersonRepository();
 

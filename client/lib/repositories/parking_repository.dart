@@ -1,61 +1,34 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import '../models/parking.dart';
 import '../http_service.dart';
 
 class ParkingRepository {
   // Fetch all parkings
   Future<List<Parking>> fetchAll() async {
-    final response = await http.get(Uri.parse('$baseUrl/parkings'));
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      return data.map((json) => Parking.fromJson(json)).toList();
-    } else {
-      throw Exception('Failed to load parkings');
-    }
+    final data = await apiClient.get('/parkings');
+    return (data as List).map((json) => Parking.fromJson(json)).toList();
   }
 
   // Fetch a parking by ID
   Future<Parking?> getById(String id) async {
-    final response = await http.get(Uri.parse('$baseUrl/parkings/$id'));
-    if (response.statusCode == 200) {
-      return Parking.fromJson(json.decode(response.body));
-    } else if (response.statusCode == 404) {
-      return null; // Parking not found
-    } else {
-      throw Exception('Failed to load parking');
-    }
+    final data = await apiClient.get('/parkings/$id');
+    return data != null ? Parking.fromJson(data) : null;
   }
 
   // Create a new parking
   Future<void> createParking(Parking parking) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/parkings'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(parking.toJson()),
-    );
-    if (response.statusCode != 201) {
-      throw Exception('Failed to create parking');
-    }
+    await apiClient.post('/parkings', parking.toJson());
+    print('Parking created successfully');
   }
 
   // Update an existing parking
   Future<void> updateParking(String id, Parking parking) async {
-    final response = await http.put(
-      Uri.parse('$baseUrl/parkings/$id'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(parking.toJson()),
-    );
-    if (response.statusCode != 200) {
-      throw Exception('Failed to update parking');
-    }
+    await apiClient.put('/parkings/$id', parking.toJson());
+    print('Parking updated successfully');
   }
 
   // Delete a parking
   Future<void> deleteParking(String id) async {
-    final response = await http.delete(Uri.parse('$baseUrl/parkings/$id'));
-    if (response.statusCode != 200) {
-      throw Exception('Failed to delete parking');
-    }
+    await apiClient.delete('/parkings/$id');
+    print('Parking deleted successfully');
   }
 }

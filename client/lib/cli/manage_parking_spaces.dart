@@ -2,7 +2,7 @@ import 'dart:io';
 import '../repositories/parking_space_repository.dart';
 import '../models/parking_space.dart';
 
-void manageParkingSpaces() async {
+Future<void> manageParkingSpaces() async {
   final repository = ParkingSpaceRepository();
 
   print('\nDu har valt att hantera Parkeringsplatser.');

@@ -2,7 +2,7 @@ import 'dart:io';
 import '../repositories/person_repository.dart';
 import '../models/person.dart';
 
-void managePersons() async {
+Future<void> managePersons() async {
   final repository = PersonRepository();
   while (true) {
     print('\nDu har valt att hantera Personer.');
@@ -16,7 +16,7 @@ void managePersons() async {
 
     switch (choice) {
       case '1':
-        // Skapa en ny person
+        print('Creating a new person');
         stdout.write('Ange namn: ');
         var name = stdin.readLineSync();
         stdout.write('Ange personnummer: ');
@@ -27,12 +27,13 @@ void managePersons() async {
         var person =
             Person(personalNumber: personalNumber!, name: name!, email: email!);
         await repository.createPerson(person);
-        print('Person skapad: $person');
+        print('Person created: $person');
         break;
 
       case '2':
-        // Visa alla registrerade personer
+        print('Fetching all persons');
         var persons = await repository.fetchAll();
+        print('Fetched persons: ${persons.length}');
         if (persons.isEmpty) {
           print('Inga personer registrerade.');
         } else {
@@ -43,7 +44,7 @@ void managePersons() async {
         break;
 
       case '3':
-        // Uppdatera en befintlig person
+        print('Updating an existing person');
         stdout.write('Ange personnummer för den person du vill uppdatera: ');
         var personalNumber = stdin.readLineSync();
         var person = await repository.getById(personalNumber!);
@@ -62,19 +63,19 @@ void managePersons() async {
         person.email = newEmail!;
 
         await repository.updatePerson(person.personalNumber, person);
-        print('Person uppdaterad: $person');
+        print('Person updated: $person');
         break;
 
       case '4':
-        // Ta bort en person
+        print('Deleting a person');
         stdout.write('Ange personnummer för den person du vill ta bort: ');
         var personalNumber = stdin.readLineSync();
         await repository.deletePerson(personalNumber!);
-        print('Person borttagen.');
+        print('Person deleted.');
         break;
 
       case '5':
-        // Gå tillbaka till huvudmenyn
+        print('Returning to main menu');
         return;
 
       default:
