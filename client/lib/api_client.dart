@@ -1,74 +1,58 @@
-import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ApiClient {
   final String baseUrl;
 
-  ApiClient({required this.baseUrl});
+  ApiClient({required this.baseUrl}); // Use named parameter
 
-  // A generic GET request function
   Future<dynamic> get(String endpoint) async {
-    final url = Uri.parse('$baseUrl$endpoint');
-    try {
-      final response = await http.get(url);
-      return _processResponse(response);
-    } catch (e) {
-      print('Error making GET request: $e');
+    final response = await http.get(Uri.parse('$baseUrl$endpoint'));
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
       throw Exception('Error connecting to server');
     }
   }
 
-  // A generic POST request function
   Future<dynamic> post(String endpoint, Map<String, dynamic> body) async {
-    final url = Uri.parse('$baseUrl$endpoint');
-    try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(body),
-      );
-      return _processResponse(response);
-    } catch (e) {
-      print('Error making POST request: $e');
+    final response = await http.post(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(body),
+    );
+
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
+    if (response.statusCode == 201) {
+      try {
+        return jsonDecode(response.body);
+      } catch (e) {
+        return response.body; // Return plain text if not JSON
+      }
+    } else {
       throw Exception('Error connecting to server');
     }
   }
 
   Future<dynamic> put(String endpoint, Map<String, dynamic> body) async {
-    final url = Uri.parse('$baseUrl$endpoint');
-    try {
-      final response = await http.put(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(body),
-      );
-      return _processResponse(response);
-    } catch (e) {
-      print('Error making PUT request: $e');
-      throw Exception('Error connecting to server');
-    }
-  }
-
-  Future<dynamic> delete(String endpoint) async {
-    final url = Uri.parse('$baseUrl$endpoint');
-    try {
-      final response = await http.delete(url);
-      return _processResponse(response);
-    } catch (e) {
-      print('Error making DELETE request: $e');
-      throw Exception('Error connecting to server');
-    }
-  }
-
-  // Helper function to process the HTTP response
-  dynamic _processResponse(http.Response response) {
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    final response = await http.put(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(body),
+    );
+    if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      throw Exception(
-          'Failed to process request. Status code: ${response.statusCode}');
+      throw Exception('Error connecting to server');
+    }
+  }
+
+  Future<void> delete(String endpoint) async {
+    final response = await http.delete(Uri.parse('$baseUrl$endpoint'));
+    if (response.statusCode != 200) {
+      throw Exception('Error connecting to server');
     }
   }
 }

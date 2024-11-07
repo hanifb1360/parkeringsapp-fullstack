@@ -24,10 +24,14 @@ Future<void> managePersons() async {
         stdout.write('Ange email: ');
         var email = stdin.readLineSync();
 
-        var person =
-            Person(personalNumber: personalNumber!, name: name!, email: email!);
+        var person = Person(
+          id: 0, // Temporary ID value
+          personalNumber: personalNumber!,
+          name: name!,
+          email: email!,
+        );
         await repository.createPerson(person);
-        print('Person created: $person');
+        print('Person skapad: $person');
         break;
 
       case '2':

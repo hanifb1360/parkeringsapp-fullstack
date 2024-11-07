@@ -10,19 +10,23 @@ class Parking {
     required this.parkingSpaceId,
     required this.vehicleRegNumber,
     required this.startTime,
-    this.endTime, // Use this for the nullable field
+    this.endTime,
   });
 
   // Convert JSON to Parking object
   factory Parking.fromJson(Map<String, dynamic> json) {
     return Parking(
-      id: json['id'],
-      parkingSpaceId: json['parkingSpaceId'],
-      vehicleRegNumber: json['vehicleRegNumber'],
-      startTime: DateTime.parse(json['startTime']),
+      id: json['id']?.toString() ?? '', // Ensuring `id` is a String
+      parkingSpaceId: json['parkingSpaceId']?.toString() ??
+          '', // Ensuring `parkingSpaceId` is a String
+      vehicleRegNumber: json['vehicleRegNumber'] ??
+          '', // Defaulting to empty string if `null`
+      startTime: json['startTime'] != null
+          ? DateTime.parse(json['startTime'])
+          : DateTime.now(), // Handling `null` for `startTime`
       endTime: json['endTime'] != null
           ? DateTime.parse(json['endTime'])
-          : null, // Handle null endTime
+          : null, // Handling `null` for `endTime`
     );
   }
 
@@ -33,7 +37,7 @@ class Parking {
       'parkingSpaceId': parkingSpaceId,
       'vehicleRegNumber': vehicleRegNumber,
       'startTime': startTime.toIso8601String(),
-      'endTime': endTime?.toIso8601String(), // Use optional chaining
+      'endTime': endTime?.toIso8601String(),
     };
   }
 

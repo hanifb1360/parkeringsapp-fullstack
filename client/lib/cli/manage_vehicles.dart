@@ -27,30 +27,38 @@ Future<void> manageVehicles() async {
       stdout.write('Ange ägarens personnummer: ');
       var ownerPersonalNumber = stdin.readLineSync();
 
-      var owner =
-          await personRepo.getById(ownerPersonalNumber!); // Fetch owner by ID
-      if (owner == null) {
-        print('Ägaren hittades inte.');
-        return;
-      }
+      try {
+        var owner =
+            await personRepo.getById(ownerPersonalNumber!); // Fetch owner by ID
+        if (owner == null) {
+          print('Ägaren hittades inte.');
+          return;
+        }
 
-      var vehicle = Vehicle(
-        regNumber: registrationNumber!,
-        ownerPersonalNumber: ownerPersonalNumber,
-        model: model!,
-      );
-      await vehicleRepo.createVehicle(vehicle);
-      print('Fordon skapad: $vehicle');
+        var vehicle = Vehicle(
+          regNumber: registrationNumber!,
+          ownerPersonalNumber: ownerPersonalNumber,
+          model: model!,
+        );
+        await vehicleRepo.createVehicle(vehicle);
+        print('Fordon skapad: $vehicle');
+      } catch (e) {
+        print('Error creating vehicle or connecting to server: $e');
+      }
       break;
 
     case '2':
-      var vehicles = await vehicleRepo.fetchAll();
-      if (vehicles.isEmpty) {
-        print('Inga fordon registrerade.');
-      } else {
-        for (var vehicle in vehicles) {
-          print(vehicle);
+      try {
+        var vehicles = await vehicleRepo.fetchAll();
+        if (vehicles.isEmpty) {
+          print('Inga fordon registrerade.');
+        } else {
+          for (var vehicle in vehicles) {
+            print(vehicle);
+          }
         }
+      } catch (e) {
+        print('Error fetching vehicles: $e');
       }
       break;
 
@@ -58,32 +66,45 @@ Future<void> manageVehicles() async {
       stdout
           .write('Ange registreringsnummer för det fordon du vill uppdatera: ');
       var registrationNumber = stdin.readLineSync();
-      var vehicle =
-          await vehicleRepo.getById(registrationNumber!); // Fetch by reg number
 
-      if (vehicle == null) {
-        print('Fordon hittades inte.');
-        return;
+      try {
+        var vehicle = await vehicleRepo
+            .getById(registrationNumber!); // Fetch by reg number
+        if (vehicle == null) {
+          print('Fordon hittades inte.');
+          return;
+        }
+
+        stdout.write('Ange ny modell (bil, motorcykel, etc.): ');
+        var newModel = stdin.readLineSync();
+        vehicle.model = newModel!;
+
+        await vehicleRepo.updateVehicle(vehicle.regNumber, vehicle);
+        print('Fordon uppdaterad: $vehicle');
+      } catch (e) {
+        print('Error updating vehicle: $e');
       }
-
-      stdout.write('Ange ny modell (bil, motorcykel, etc.): ');
-      var newModel = stdin.readLineSync();
-      vehicle.model = newModel!;
-
-      await vehicleRepo.updateVehicle(vehicle.regNumber, vehicle);
-      print('Fordon uppdaterad: $vehicle');
       break;
 
     case '4':
       stdout.write('Ange registreringsnummer för det fordon du vill ta bort: ');
       var registrationNumber = stdin.readLineSync();
-      await vehicleRepo
-          .deleteVehicle(registrationNumber!); // Use registrationNumber
-      print('Fordon borttagen.');
+
+      try {
+        await vehicleRepo
+            .deleteVehicle(registrationNumber!); // Use registrationNumber
+        print('Fordon borttagen.');
+      } catch (e) {
+        print('Error deleting vehicle: $e');
+      }
       break;
 
     case '5':
-      await searchVehiclesByOwner(vehicleRepo);
+      try {
+        await searchVehiclesByOwner(vehicleRepo);
+      } catch (e) {
+        print('Error searching vehicles by owner: $e');
+      }
       break;
 
     case '6':

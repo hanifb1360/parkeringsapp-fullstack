@@ -12,9 +12,12 @@ class ParkingSpace {
   // Convert JSON to ParkingSpace object
   factory ParkingSpace.fromJson(Map<String, dynamic> json) {
     return ParkingSpace(
-      id: json['id'],
-      address: json['address'],
-      pricePerHour: json['pricePerHour'].toDouble(),
+      id: json['id']?.toString() ??
+          '', // Ensuring `id` is a String and handling `null`
+      address: json['address'] ?? '', // Defaulting to empty string if `null`
+      pricePerHour: json['pricePerHour'] != null
+          ? json['pricePerHour'].toDouble()
+          : 0.0, // Handling `null` for `pricePerHour`
     );
   }
 

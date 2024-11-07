@@ -12,9 +12,11 @@ class Vehicle {
   // Convert JSON to Vehicle object
   factory Vehicle.fromJson(Map<String, dynamic> json) {
     return Vehicle(
-      regNumber: json['regNumber'],
-      ownerPersonalNumber: json['ownerPersonalNumber'],
-      model: json['model'],
+      regNumber: json['regNumber']?.toString() ??
+          '', // Ensuring `regNumber` is a String
+      ownerPersonalNumber: json['ownerPersonalNumber']?.toString() ??
+          '', // Ensuring `ownerPersonalNumber` is a String
+      model: json['model'] ?? '', // Defaulting to empty string if `null`
     );
   }
 
